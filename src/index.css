@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-main: #08080a;
+    --bg-card: #141318;
+    --bg-surface: #1b1821;
+    --pink: #ea7ca2;
+    --pink-dark: #c95b82;
+    --pink-glow: rgba(234, 124, 162, 0.22);
+    --text-muted: #b8b1c0;
+    --border-pink: rgba(234, 124, 162, 0.3);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    font-family: "Cairo", system-ui, -apple-system, sans-serif;
+    background-color: var(--bg-main);
+    color: #ffffff;
+  }
+
+  body {
+    background: radial-gradient(circle at top center, #1d131a 0%, var(--bg-main) 45%);
+    min-height: 100vh;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
