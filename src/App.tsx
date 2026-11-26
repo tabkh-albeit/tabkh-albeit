@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   ShoppingBag,
   Search,
@@ -15,6 +15,7 @@ import {
   FileText,
   Truck,
   ExternalLink,
+  CreditCard,
 } from 'lucide-react';
 import {
   CATEGORIES,
@@ -29,14 +30,52 @@ import { DishMedia } from '@/src/components/DishMedia';
 import { CartDrawer, type CartItem } from '@/src/components/CartDrawer';
 import { StoreInfoModal } from '@/src/components/StoreInfoModal';
 import { ChatWidget } from '@/src/components/ChatWidget';
+import { PaymentPage } from '@/src/components/PaymentPage';
+
+type ActivePage = 'home' | 'payment';
 
 export default function App() {
+  const [activePage, setActivePage] = useState<ActivePage>(() =>
+    typeof window !== 'undefined' && window.location.hash === '#payment'
+      ? 'payment'
+      : 'home'
+  );
   const [cart, setCart] = useState<CartItem[]>([]);
   const [activeCategory, setActiveCategory] = useState<CategoryId | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isStoreModalOpen, setIsStoreModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      setActivePage(window.location.hash === '#payment' ? 'payment' : 'home');
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  const openPaymentPage = () => {
+    setActivePage('payment');
+    if (window.location.hash !== '#payment') {
+      window.history.pushState(null, '', '#payment');
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const openHomeSection = (sectionId?: string) => {
+    setActivePage('home');
+    if (sectionId && sectionId !== 'top') {
+      setActiveCategory('all');
+      window.history.pushState(null, '', `#${sectionId}`);
+      window.setTimeout(() => {
+        document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+      }, 40);
+    } else {
+      window.history.pushState(null, '', window.location.pathname);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
 
   const totalItems = useMemo(
     () => cart.reduce((sum, item) => sum + item.qty, 0),
@@ -139,6 +178,12 @@ export default function App() {
             {/* Zone 1: Brand Wordmark */}
             <a
               href="#top"
+              onClick={(e) => {
+                if (activePage === 'payment') {
+                  e.preventDefault();
+                  openHomeSection('top');
+                }
+              }}
               className="flex shrink-0 items-center gap-2 whitespace-nowrap rounded-[6px] bg-[#2E2A2A]/45 px-3 py-1 text-base font-black tracking-tight text-white focus-visible:outline-2 focus-visible:outline-[#FF8FAB]"
             >
               <BrandMark className="h-5 w-6 shrink-0" />
@@ -148,13 +193,20 @@ export default function App() {
             {/* Zone 2: Concise single-line navigation links */}
             <nav
               aria-label="أقسام المنيو"
-              className="hidden items-center gap-5 text-sm font-bold text-[#b8b1c0] lg:flex"
+              className="hidden items-center gap-4 text-sm font-bold text-[#b8b1c0] lg:flex"
             >
               {CATEGORIES.map((cat) => (
                 <a
                   key={cat.id}
                   href={`#${cat.id}`}
-                  onClick={() => setActiveCategory('all')}
+                  onClick={(e) => {
+                    if (activePage === 'payment') {
+                      e.preventDefault();
+                      openHomeSection(cat.id);
+                    } else {
+                      setActiveCategory('all');
+                    }
+                  }}
                   className="shrink-0 whitespace-nowrap py-1 transition-colors duration-150 hover:text-[#FF8FAB]"
                 >
                   {cat.title}
@@ -162,9 +214,27 @@ export default function App() {
               ))}
               <a
                 href="#contact"
+                onClick={(e) => {
+                  if (activePage === 'payment') {
+                    e.preventDefault();
+                    openHomeSection('contact');
+                  }
+                }}
                 className="shrink-0 whitespace-nowrap py-1 transition-colors duration-150 hover:text-[#FF8FAB]"
               >
                 التواصل والتوصيل
+              </a>
+              <a
+                href="#payment"
+                onClick={(e) => {
+                  e.preventDefault();
+                  openPaymentPage();
+                }}
+                className={`shrink-0 whitespace-nowrap py-1 transition-colors duration-150 hover:text-[#FF8FAB] ${
+                  activePage === 'payment' ? 'text-[#FF8FAB]' : ''
+                }`}
+              >
+                طرق الدفع
               </a>
             </nav>
 
@@ -184,6 +254,10 @@ export default function App() {
         </header>
 
         <main>
+          {activePage === 'payment' ? (
+            <PaymentPage onBackToMenu={() => openHomeSection('menu')} />
+          ) : (
+            <>
           {/* Hero Box with Double Pink Border */}
           <section className="wire-box mt-2.5 rounded-[10px] bg-[#121010]/35 px-4 py-7 text-center backdrop-blur-[6px] sm:px-8 sm:py-9">
             <p className="text-xs font-bold tracking-wide text-[#FFD700] sm:text-sm">
@@ -567,7 +641,7 @@ export default function App() {
                 </span>
               </div>
 
-              <div className="flex shrink-0 items-center gap-2.5">
+              <div className="flex flex-wrap shrink-0 items-center justify-center gap-2.5">
                 <a
                   href={`https://wa.me/${STORE_INFO.phoneWhatsapp}`}
                   target="_blank"
@@ -578,6 +652,17 @@ export default function App() {
                   <ExternalLink className="h-3.5 w-3.5" />
                 </a>
                 <a
+                  href="#payment"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    openPaymentPage();
+                  }}
+                  className="inline-flex items-center gap-1.5 whitespace-nowrap border border-[#F48FB1]/55 bg-[#121010]/45 px-4 py-2 text-xs font-bold text-white transition-colors hover:border-[#F48FB1] hover:text-[#FF8FAB]"
+                >
+                  <CreditCard className="h-3.5 w-3.5 text-[#FF8FAB]" />
+                  <span>طرق الدفع</span>
+                </a>
+                <a
                   href={`mailto:${STORE_INFO.email}`}
                   className="inline-flex items-center whitespace-nowrap border border-[#F48FB1]/55 bg-[#121010]/45 px-4 py-2 text-xs font-bold text-white transition-colors hover:border-[#F48FB1]"
                 >
@@ -586,6 +671,8 @@ export default function App() {
               </div>
             </div>
           </section>
+            </>
+          )}
 
           {/* Quiet Footer */}
           <footer className="mt-8 border-t border-white/10 py-6 text-center text-xs text-[#d6cfdf]">
@@ -604,31 +691,58 @@ export default function App() {
       {/* Mobile Bottom Navigation */}
       <nav
         aria-label="التنقل السريع"
-        className="fixed right-0 bottom-0 left-0 z-40 flex items-center justify-around border-t border-[#FF8FAB]/40 bg-[#121010]/60 px-2 py-2 backdrop-blur-md md:hidden"
+        className="fixed right-0 bottom-0 left-0 z-40 flex items-center justify-around border-t border-[#FF8FAB]/40 bg-[#121010]/60 px-1.5 py-2 backdrop-blur-md md:hidden"
       >
         <a
           href="#top"
-          className="flex flex-col items-center gap-0.5 px-3 py-1 text-xs font-bold text-[#FF8FAB]"
+          onClick={(e) => {
+            if (activePage === 'payment') {
+              e.preventDefault();
+              openHomeSection('top');
+            }
+          }}
+          className={`flex flex-col items-center gap-0.5 px-2 py-1 text-[11px] font-bold ${
+            activePage === 'home' ? 'text-[#FF8FAB]' : 'text-[#b8b1c0] hover:text-white'
+          }`}
         >
           <Home className="h-4 w-4" />
           <span>الرئيسية</span>
         </a>
         <a
           href="#menu"
-          className="flex flex-col items-center gap-0.5 px-3 py-1 text-xs font-bold text-[#b8b1c0] hover:text-white"
+          onClick={(e) => {
+            if (activePage === 'payment') {
+              e.preventDefault();
+              openHomeSection('menu');
+            }
+          }}
+          className="flex flex-col items-center gap-0.5 px-2 py-1 text-[11px] font-bold text-[#b8b1c0] hover:text-white"
         >
           <UtensilsCrossed className="h-4 w-4" />
           <span>الأطباق</span>
         </a>
+        <a
+          href="#payment"
+          onClick={(e) => {
+            e.preventDefault();
+            openPaymentPage();
+          }}
+          className={`flex flex-col items-center gap-0.5 px-2 py-1 text-[11px] font-bold ${
+            activePage === 'payment' ? 'text-[#FF8FAB]' : 'text-[#b8b1c0] hover:text-white'
+          }`}
+        >
+          <CreditCard className="h-4 w-4" />
+          <span>طرق الدفع</span>
+        </a>
         <button
           type="button"
           onClick={() => setIsCartOpen(true)}
-          className="relative flex flex-col items-center gap-0.5 px-3 py-1 text-xs font-bold text-[#b8b1c0] hover:text-white"
+          className="relative flex flex-col items-center gap-0.5 px-2 py-1 text-[11px] font-bold text-[#b8b1c0] hover:text-white"
         >
           <ShoppingBag className="h-4 w-4" />
           <span>السلة</span>
           {totalItems > 0 && (
-            <span className="tabular-nums absolute -top-0.5 left-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#FF8FAB] px-1 text-[10px] font-black text-[#140b0f]">
+            <span className="tabular-nums absolute -top-0.5 left-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#FF8FAB] px-1 text-[10px] font-black text-[#140b0f]">
               {totalItems}
             </span>
           )}
@@ -636,7 +750,7 @@ export default function App() {
         <button
           type="button"
           onClick={() => setIsStoreModalOpen(true)}
-          className="flex flex-col items-center gap-0.5 px-3 py-1 text-xs font-bold text-[#b8b1c0] hover:text-white"
+          className="flex flex-col items-center gap-0.5 px-2 py-1 text-[11px] font-bold text-[#b8b1c0] hover:text-white"
         >
           <User className="h-4 w-4" />
           <span>المتجر</span>

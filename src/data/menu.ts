@@ -32,6 +32,17 @@ export const STORE_INFO = {
   heroImage: img('hero_arabic_feast_1795506676463.jpg'),
 } as const;
 
+export const PAYMENT_INFO = {
+  pageTitle: 'طرق الدفع والتحويل البنكي',
+  bankName: 'مصرف الراجحي',
+  accountHolder: 'روضه واصل خليل المغربي',
+  accountNumber: '440000010006080043055',
+  ibanDisplay: 'SA91 8000 0440 6080 1004 3055',
+  ibanCompact: 'SA9180000440608010043055',
+  swiftCode: 'RJHISARI',
+  qrImage: `${import.meta.env.BASE_URL}assets/aistudio/WhatsApp_Image_2026-11-26_at_3.34.45_PM_fe36e42d.jpeg`,
+} as const;
+
 export const CATEGORIES: CategoryMeta[] = [
   {
     id: 'rice',
