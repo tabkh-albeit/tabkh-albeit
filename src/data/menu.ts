@@ -171,7 +171,7 @@ export const MENU_ITEMS: DishItem[] = [
   },
   {
     id: 'kibbeh-spring-rolls',
-    name: 'كبة و سبرنغ رول',
+    name: 'كبة وسبرنغ رول',
     category: 'appetizers',
     categoryLabel: 'الصواني والمقبلات',
     subtitle: 'تشكيلة مقرمشة — كبة مقلية + سبرنغ رول بالخضار',
@@ -181,7 +181,7 @@ export const MENU_ITEMS: DishItem[] = [
   },
   {
     id: 'manto-sambosa',
-    name: 'منتو و سمبوسة و فرموزة',
+    name: 'منتو وسمبوسة وفرموزة',
     category: 'appetizers',
     categoryLabel: 'الصواني والمقبلات',
     subtitle: 'تشكيلة لذيذة — منتو على البخار + سمبوسة حارة + فرموزة باللحم أو الجبنة',

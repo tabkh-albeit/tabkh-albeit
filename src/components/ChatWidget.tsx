@@ -172,7 +172,7 @@ export function ChatWidget() {
             {isLoading && (
               <div className="flex items-center gap-2 self-end rounded-2xl rounded-bl-sm border border-white/8 bg-[#1b1821] px-3.5 py-2.5 text-xs font-semibold text-[#b8b1c0]">
                 <Loader2 className="h-3.5 w-3.5 animate-spin text-[#ea7ca2]" />
-                <span>جاري كتابة الرد...</span>
+                <span>جارٍ كتابة الرد...</span>
               </div>
             )}
 

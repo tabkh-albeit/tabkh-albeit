@@ -143,7 +143,7 @@ export function CartDrawer({
                 <Check className="h-6 w-6" />
               </div>
               <h3 className="mt-3 text-lg font-extrabold text-white">
-                تم تجهيز طلبك لإرسال واتساب
+                تم تجهيز طلبك لإرساله عبر واتساب
               </h3>
               <p className="mt-1.5 text-sm text-[#b8b1c0]">
                 إذا لم تُفتح نافذة واتساب تلقائياً، يمكنك الضغط على الزر أدناه أو نسخ تفاصيل الطلب وإرسالها إلى{' '}
